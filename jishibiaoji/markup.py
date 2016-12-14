@@ -1,7 +1,7 @@
 import sys
 import re
 from handlers import *
-from util import *
+from utils import *
 from rules import *
 
 
