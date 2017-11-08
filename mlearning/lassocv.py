@@ -64,7 +64,7 @@ train_Y = data_clean.iloc[:-1, -1]
 pred_X = X_pred_std
 
 # 进行lasso回归的n_folds交叉验证,选择最好的模型
-num_folds = 20
+num_folds = 5
 lasso_model = LassoCV(cv=num_folds).fit(train_X, train_Y)
 
 fig1, ax1 = plt.subplots()
