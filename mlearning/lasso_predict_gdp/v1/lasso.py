@@ -20,14 +20,14 @@ ENGINE = create_engine(
 
 TABLE_NAME = 't_shenzhen_baiduindex_v1.0'
 DATAFRAME = pd.read_sql_table(TABLE_NAME, ENGINE)
-FEATURES = list(DATAFRAME.keys())[3:-3]
+FEATURES = list(DATAFRAME.keys())[3:-4]
 predictors = DATAFRAME.copy()
-predictors = predictors.iloc[:, 3:-2]
+predictors = predictors.iloc[:, 3:-3]
 
 # 对训练数据的集的自变量做标准化
 X_data = predictors.iloc[:-1, :-1]
 X_pred = predictors.iloc[-1, :-1]
-y_data = DATAFRAME.iloc[:-1, -3]
+y_data = DATAFRAME.iloc[:-1, -4]
 X_desc = X_data.describe()
 
 for feature_index in range(len(FEATURES)):
@@ -36,9 +36,9 @@ for feature_index in range(len(FEATURES)):
     X_data.iloc[:, feature_index] = (
         (X_data.iloc[:, feature_index] - mean) / std)
     X_pred.iloc[feature_index] = (X_pred.iloc[feature_index] - mean) / std
-# scaler = preprocessing.StandardScaler()
-# scaler.fit(predictors)
-# scaled_data = scaler.transform(predictors)
+scaler = preprocessing.StandardScaler()
+scaler.fit(predictors)
+scaled_data = scaler.transform(predictors)
 
 
 # for feature in FEATURES:

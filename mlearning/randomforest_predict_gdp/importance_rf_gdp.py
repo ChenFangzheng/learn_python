@@ -19,20 +19,20 @@ rcParams.update({'figure.autolayout': True})
 ENGINE = create_engine(
     'mysql+mysqlconnector://root:Pass@word@127.0.0.1/economic_forecast')
 
-TABLE_NAME = 't_shenzhen_baiduindex_v1.0'
+TABLE_NAME = 't_nanning_baiduindex_v3'
 DATAFRAME = pd.read_sql_table(TABLE_NAME, ENGINE)
-FEATURES = list(DATAFRAME.keys())[3:-3]
+FEATURES = list(DATAFRAME.keys())[3:-4]
 predictors = DATAFRAME.copy()
-predictors = predictors.iloc[:, 3:-2]
+predictors = predictors.iloc[:, 3:-3]
 
 # 对训练数据的集的自变量做标准化
 X_data = predictors.iloc[:-1, :-1]
 X_pred = predictors.iloc[-1, :-1]
-y_data = DATAFRAME.iloc[:-1, -3]
+y_data = DATAFRAME.iloc[:-1, -4]
 
 #　构建随机森林，预测数据
-model_rf = RandomForestRegressor(n_estimators=50, oob_score=True,
-                                 n_jobs=-1, random_state=50, max_features="auto")
+model_rf = RandomForestRegressor(n_estimators=5000, oob_score=True,
+                                 n_jobs=-1, random_state=500, max_features="auto")
 model_rf.fit(X_data, y_data)
 
 y_pred_all = model_rf.predict(X_data)
@@ -59,23 +59,23 @@ DataFrame(model_rf.feature_importances_,
 
 
 # 特征重要性列表 Mean decrease accuracy
-scores = defaultdict(list)
-rs = ShuffleSplit(n_splits=len(X_data), test_size=0.3, random_state=100)
+# scores = defaultdict(list)
+# rs = ShuffleSplit(n_splits=len(X_data), test_size=0.3, random_state=100)
 
-for train_idx, test_idx in rs.split(X_data):
-    X_train, X_test = X_data.iloc[train_idx], X_data.iloc[test_idx]
-    Y_train, Y_test = y_data.iloc[train_idx], y_data.iloc[test_idx]
-    r = model_rf.fit(X_train, Y_train)
-    acc = r2_score(Y_test, r.predict(X_test))
-    for i in range(X_data.shape[1]):
-        X_t = X_test.copy()
-        # np.random.shuffle(X_t.iloc[:, i])
-        X_t.iloc[:, i] = 1
-        shuff_acc = r2_score(Y_test, r.predict(X_t))
-        scores[FEATURES[i]].append((acc - shuff_acc) / acc)
+# for train_idx, test_idx in rs.split(X_data):
+#     X_train, X_test = X_data.iloc[train_idx], X_data.iloc[test_idx]
+#     Y_train, Y_test = y_data.iloc[train_idx], y_data.iloc[test_idx]
+#     r = model_rf.fit(X_train, Y_train)
+#     acc = r2_score(Y_test, r.predict(X_test))
+#     for i in range(X_data.shape[1]):
+#         X_t = X_test.copy()
+#         # np.random.shuffle(X_t.iloc[:, i])
+#         X_t.iloc[:, i] = 1
+#         shuff_acc = r2_score(Y_test, r.predict(X_t))
+#         scores[FEATURES[i]].append((acc - shuff_acc) / acc)
 
-importance2 = sorted([(feat, abs((round(np.mean(score), 4))))
-                      for feat, score in scores.items()], reverse=True)
-df_im2=DataFrame(list(importance2),
-                   columns=['feature name', 'weight'])
-df_im2.to_excel('Feature_importance2.xlsx', sheet_name='importance2')
+# importance2 = sorted([(feat, abs((round(np.mean(score), 4))))
+#                       for feat, score in scores.items()], reverse=True)
+# df_im2=DataFrame(list(importance2),
+#                    columns=['feature name', 'weight'])
+# df_im2.to_excel('Feature_importance2.xlsx', sheet_name='importance2')
